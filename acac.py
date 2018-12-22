@@ -34,7 +34,7 @@ else:
     prefix = 'sqlite:////'
 
 # if use mysql
-# prefix = 'mysql://root:0327@localhost/test/'
+mysql_prefix = 'mysql+pymysql://root:0327@localhost/test'
 
 app = Flask(__name__)
 app.jinja_env.trim_blocks = True
@@ -46,7 +46,8 @@ app.config['ALLOWED_EXTENSIONS'] = ['png', 'jpg', 'jpeg', 'gif']
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'secret string')
 
 # SQLAlchemy config
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', prefix + os.path.join(app.root_path, 'demo.sqlite'))
+# app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', prefix + os.path.join(app.root_path, 'demo.sqlite'))
+app.config['SQLALCHEMY_DATABASE_URI'] = mysql_prefix
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Flask-Dropzone config
@@ -75,12 +76,23 @@ dropzone = Dropzone(app)
 
 
 #Models
-# TODO(Mojerro): add relationships and foreignkeys among tables.
+# add relationships and foreignkeys among tables.
+association_table = db.Table('association',
+                             db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
+                             db.Column('game_id', db.Integer, db.ForeignKey('game.id'))
+                             )
+
+
 class User (db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(20))
+    name = db.Column(db.String(20), unique=True, index=True)
     sex = db.Column(db.Boolean)
-    id_num = db.Column(db.String(18))
+    id_num = db.Column(db.String(18), unique=True)  # ID card number
+    club_id = db.Column(db.Integer, db.ForeignKey('club.id'))
+    club = db.relationship('Club')
+    games = db.relationship('Game',
+                            secondary=association_table,
+                            back_populates='users')
 
     def __repr__(self):
         return '<User %r>' % self.name
@@ -88,8 +100,9 @@ class User (db.Model):
 
 class Club(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    club = db.Column(db.String(15))
-    logo_path = db.Column(db.String)
+    club = db.Column(db.String(15), unique=True)
+    logo_path = db.Column(db.String(127), unique=True)
+    users = db.relationship('User')
 
     def __repr__(self):
         return '<Club %r>' % self.club
@@ -97,9 +110,12 @@ class Club(db.Model):
 
 class Game(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    game = db.Column(db.String)
-    date = db.Column(db.Date)
-    location = db.Column(db.String)
+    game = db.Column(db.String(63), unique=True)
+    date = db.Column(db.Date, index=True)
+    location = db.Column(db.String(127))
+    users = db.relationship('User',
+                            secondary=association_table,
+                            back_populates='games')
 
     def __repr__(self):
         return 'Game %r' % self.game
