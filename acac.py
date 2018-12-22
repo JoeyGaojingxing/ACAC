@@ -15,7 +15,9 @@ from flask import Flask, flash, url_for, render_template, request
 from flask import render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_dropzone import Dropzone
-from flask_wtf.csrf import validate_csrf
+# from flask_wtf.csrf import validate_csrf
+
+from forms import SetTitleForm
 
 
 # SQLite URI compatible
@@ -62,6 +64,7 @@ def initdb(drop):
     """Initialize the database"""
     if drop:
         db.drop_all()
+        click.echo('Database dropped')
     db.create_all()
     click.echo('Initialized database')
 
@@ -112,6 +115,12 @@ def random_filename(filename):
     new_filename = uuid.uuid4().hex + ext
     return new_filename
     
+
+@app.route('/game/name')
+def game_name():
+    form = SetTitleForm()
+    return render_template('game_name.html', form=form)
+
 
 # index page, use WTForm to upload excels.
 @app.route('/', methods=['GET', 'POST'])

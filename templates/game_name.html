@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>ACAC报名管理</h1>
+
+<form method="post">
+    {{ form.csrf_token }}
+    {{ form.title.label }}<br>
+    {{ form.title }}<br>
+    {{ form.submit }}<br>
+</form>
+{% endblock %}
