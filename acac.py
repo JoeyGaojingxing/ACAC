@@ -11,10 +11,13 @@ import uuid
 
 import click
 import pandas as pd
-from flask import Flask, flash, url_for, render_template, request
+from datetime import datetime
+from flask import Flask, flash, url_for, render_template, request, redirect
 from flask import render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_dropzone import Dropzone
+from flask_moment import Moment
+from flask_bootstrap import Bootstrap
 # from flask_wtf.csrf import validate_csrf
 
 from forms import SetTitleForm
@@ -34,7 +37,7 @@ else:
     prefix = 'sqlite:////'
 
 # if use mysql
-mysql_prefix = 'mysql+pymysql://root:0327@localhost/test'
+mysql_prefix = 'mysql+pymysql://root:0327@localhost/demo'
 
 app = Flask(__name__)
 app.jinja_env.trim_blocks = True
@@ -42,8 +45,8 @@ app.jinja_env.lstrip_blocks = True
 
 # Custom config
 app.config['UPLOAD_PATH'] = os.path.join(app.root_path, 'uploads')
-app.config['ALLOWED_EXTENSIONS'] = ['png', 'jpg', 'jpeg', 'gif']
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'secret string')
+app.config['ALLOWED_EXTENSIONS'] = ['xls', 'xlsx']
 
 # SQLAlchemy config
 # app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', prefix + os.path.join(app.root_path, 'demo.sqlite'))
@@ -51,12 +54,17 @@ app.config['SQLALCHEMY_DATABASE_URI'] = mysql_prefix
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Flask-Dropzone config
-app.config['DROPZONE_ALLOWED_FILE_TYPE'] = 'image'
+app.config['DROPZONE_ALLOWED_FILE_CUSTOM'] = True
+app.config['DROPZONE_ALLOWED_FILE_TYPE'] = '.xls, .xlsx'
 app.config['DROPZONE_MAX_FILE_SIZE'] = 3
 app.config['DROPZONE_MAX_FILES'] = 30
+# app.config['DROPZONE_ENABLE_CSRF'] = True
 
 # instantiate a db object of SQLAlchemy class
 db = SQLAlchemy(app)
+bootstrap = Bootstrap(app)
+moment = Moment(app)
+dropzone = Dropzone(app)
 
 
 @app.cli.command()
@@ -69,8 +77,6 @@ def initdb(drop):
     db.create_all()
     click.echo('Initialized database')
 
-
-dropzone = Dropzone(app)
 
 # Forms
 
@@ -93,31 +99,33 @@ class User (db.Model):
                             secondary=association_table,
                             back_populates='users')
 
-    def __repr__(self):
-        return '<User %r>' % self.name
+    # def __repr__(self):
+    #     return '<User %r>' % self.name
 
 
 class Club(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    club = db.Column(db.String(15), unique=True)
+    club = db.Column(db.String(16), unique=True)
     logo_path = db.Column(db.String(127), unique=True)
+    club_num = db.Column(db.Integer, unique=True, index=True)
     users = db.relationship('User')
 
-    def __repr__(self):
-        return '<Club %r>' % self.club
+    # def __repr__(self):
+    #     return '<Club %r>' % self.club
 
 
 class Game(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    game = db.Column(db.String(63), unique=True)
+    name = db.Column(db.String(63), unique=True)
     date = db.Column(db.Date, index=True)
     location = db.Column(db.String(127))
+    timestamp = db.Column(db.DateTime, default=datetime.now, index=True)
     users = db.relationship('User',
                             secondary=association_table,
                             back_populates='games')
 
-    def __repr__(self):
-        return 'Game %r' % self.game
+    # def __repr__(self):
+    #     return 'Game %r' % self.game
 
 
 def allowed_file(filename):
@@ -125,21 +133,35 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
 
 
-def random_filename(filename):
+def random_filename(filename, game_id: str):
     ext = os.path.splitext(filename)[1]
     new_filename = uuid.uuid4().hex + ext
-    return new_filename
-    
-# set game name
-@app.route('/game/name')
+    return str(game_id) + '_' + new_filename
+
+
+# index page, set game name
+@app.route('/', methods=['GET', 'POST'])
+@app.route('/game/name', methods=['GET', 'POST'])
 def game_name():
+    # register game name
+    games = Game.query.order_by(Game.timestamp.desc()).all()
     form = SetTitleForm()
-    return render_template('game_name.html', form=form)
+    if form.validate_on_submit():
+        name = form.name.data
+        date = default(form.date.data, datetime.now())
+        location = default(form.location.data, '默认')
+        add_game = Game(name=name, date=date, location=location)
+        db.session.add(add_game)
+        db.session.commit()
+        flash('提交成功')
+        return redirect(url_for('game_name'))
+    return render_template('game_name.html', form=form, games=games)
 
 
-# TODO(Mojerro): index page, use WTForm to upload excels.
-@app.route('/game/upload', methods=['GET', 'POST'])
-def index():
+# use WTForm to upload excels.
+@app.route('/game/upload/<int:game_id>', methods=['GET', 'POST'])
+# @app.route('/game/upload', methods=['GET', 'POST'])
+def game_upload(game_id=None):
     # Excel files upload
     if request.method == 'POST':
         # check if the post request has the file part
@@ -148,13 +170,13 @@ def index():
         f = request.files.get('file')
 
         if f and allowed_file(f.filename):
-            filename = random_filename(f.filename)
+            filename = random_filename(f.filename, game_id=game_id)
             f.save(os.path.join(
                 app.config['UPLOAD_PATH'], filename
             ))
         else:
             return 'Invalid file type.', 400
-    return render_template('index.html')
+    return render_template('game_upload.html', game_id=game_id)
 
 
 # TODO(Mojerro): return the records(rows) which have problems
@@ -168,16 +190,23 @@ def check():
     # error_list = check_regist(df)
     return render_template('check.html')
  
- 
+
+# TODO(Mojerro): return download link
 @app.route('/download/gamecard')
 def download_game_card():
-     # TODO(Mojerro): search from the db and print to pics
-     buildcard = game_card_builder()
-     return render_template()
+    # TODO(Mojerro): search from the db and print to pics
+    buildcard = game_card_builder()
+    return render_template('game_download.html')
  
 
+def default(value, default):
+    if value:
+        return value
+    return default
+
+
 def load_regist_files():
-    df = pd.DataFrame([1,2])
+    df = pd.DataFrame([1, 2])
     return df
 
 

@@ -1,43 +1,45 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    {% block head %}
-        {% block metas %}
-            <meta charset="utf-8">
-        {% endblock metas %}
-
-        <title>{% block title %}Form - HelloFlask{% endblock %}</title>
-        <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
-        {% block styles %}
-            <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css' ) }}">
-        {% endblock styles %}
-    {% endblock head %}
+{% block head %}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>{% block title %}ACAC报名管理{% endblock %}</title>
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}" type="text/css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" type="text/css">
+{% endblock head %}
 </head>
 <body>
-<nav>
-    {% block nav %}
-        <ul>
-            <li><a href="{{ url_for('index') }}">Home</a></li>
-        </ul>
-    {% endblock %}
-</nav>
-
-<main>
+<main class="container">
+    <header>
+        <h1 class="text-center display-4">
+            <a href="{{ url_for('game_name') }}" class="text-success"><strong>ACAC</strong></a>
+            <small class="text-muted sub-title">报名管理系统</small>
+        </h1>
+    </header>
     {% for message in get_flashed_messages() %}
-        <div class="alert">
+        <div class="alert alert-info">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
             {{ message }}
         </div>
     {% endfor %}
     {% block content %}{% endblock %}
+    <footer class="text-center">
+        {% block footer %}
+            <small> &copy; 2018 <a href="http://greyli.com" title="Written by Grey Li">Grey Li</a> /
+                <a href="https://github.com/greyli/sayhello" title="Fork me on GitHub">GitHub</a> /
+                <a href="http://helloflask.com" title="A HelloFlask project">HelloFlask</a>
+            </small>
+            <p><a id="bottom" href="#" title="Go Top">&uarr;</a></p>
+        {% endblock %}
+    </footer>
 </main>
-<footer>
-    {% block footer %}
-        <small> &copy; 2018 <a href="http://greyli.com" title="Written by Grey Li">Grey Li</a> /
-            <a href="https://github.com/greyli/helloflask" title="Fork me on GitHub">GitHub</a> /
-            <a href="http://helloflask.com" title="A HelloFlask project">HelloFlask</a>
-        </small>
-    {% endblock %}
-</footer>
-{% block scripts %}{% endblock %}
+
+<script type="text/javascript" src="{{ url_for('static', filename='js/jquery-3.2.1.slim.min.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/script.js') }}"></script>
+{{ moment.include_moment(local_js=url_for('static', filename='js/moment-with-locales.min.js')) }}
 </body>
 </html>

@@ -1,12 +1,23 @@
 {% extends 'base.html' %}
+{% from 'bootstrap/form.html' import render_form, render_field %}
 
 {% block content %}
-<h1>ACAC报名管理</h1>
-
-<form method="post">
-    {{ form.csrf_token }}
-    {{ form.title.label }}<br>
-    {{ form.title }}<br>
-    {{ form.submit }}<br>
-</form>
+    <div class="game-name">
+        {{ render_form(form, action=request.full_path) }}
+    </div>
+    {% for message in games %}
+        <a class="list-group-item list-group-item-action flex-column" href="{{ url_for('game_upload', game_id=message.id) }}">
+            <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1 text-success">{{ message.name }}
+                    <small class="text-muted"> #{{ loop.revindex }}</small>
+                </h5>
+                <small data-toggle="tooltip" data-placement="top"
+                       data-timestamp="{{ message.timestamp.strftime('%Y-%m-%dT%H:%M:%SZ') }}"
+                       data-delay="500">
+                    {{ moment(message.timestamp).fromNow(refresh=True) }}
+                </small>
+            </div>
+            <p class="mb-1">{{ message.location }}</p>
+        </a>
+    {% endfor %}
 {% endblock %}

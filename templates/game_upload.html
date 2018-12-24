@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block head %}
+    {{ super() }}
+    {{ dropzone.load() }}
+    {{ dropzone.style('border: 2px dashed #0087F7; margin: 10%; min-height: 300px;') }}
+{% endblock %}
+
+{% block content %}
+<h2>将报名表Excel拖到下方区域内</h2>
+{{ dropzone.create(action_view='game_upload', game_id=game_id) }}
+<a href="{{ url_for('check') }}">下一页，检查</a>
+{% endblock %}
