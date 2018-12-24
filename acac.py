@@ -75,8 +75,7 @@ dropzone = Dropzone(app)
 # Forms
 
 
-#Models
-# add relationships and foreignkeys among tables.
+# Models
 association_table = db.Table('association',
                              db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
                              db.Column('game_id', db.Integer, db.ForeignKey('game.id'))
@@ -131,15 +130,15 @@ def random_filename(filename):
     new_filename = uuid.uuid4().hex + ext
     return new_filename
     
-
+# set game name
 @app.route('/game/name')
 def game_name():
     form = SetTitleForm()
     return render_template('game_name.html', form=form)
 
 
-# index page, use WTForm to upload excels.
-@app.route('/', methods=['GET', 'POST'])
+# TODO(Mojerro): index page, use WTForm to upload excels.
+@app.route('/game/upload', methods=['GET', 'POST'])
 def index():
     # Excel files upload
     if request.method == 'POST':
@@ -158,9 +157,9 @@ def index():
     return render_template('index.html')
 
 
-# TODO(Mojerro): return the records(rows) which have problems,
+# TODO(Mojerro): return the records(rows) which have problems
 # and save the rest records to database.
-@app.route('/check')
+@app.route('/game/check')
 def check():
     # try:
     #    df = load_regist_files()
