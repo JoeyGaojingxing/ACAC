@@ -16,6 +16,7 @@ flask-dotenv = "*"
 python-dotenv = "*"
 flask-bootstrap = "*"
 pymysql = "*"
+jinja2 = "*"
 
 [requires]
 python_version = "3.6"
