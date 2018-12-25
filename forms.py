@@ -18,3 +18,9 @@ class SetTitleForm(FlaskForm):
     date = StringField('输入比赛日期 如：2018-3-9', validators=[Length(-1, 10)])    # TODO: 优化日期输入验证
     location = StringField('输入比赛地点', validators=[Length(-1, 127)])
     submit = SubmitField('提交')
+
+
+class CheckFileForm(FlaskForm):
+    check = SubmitField('Check')
+    save = SubmitField('Save')
+    next = SubmitField('Next')

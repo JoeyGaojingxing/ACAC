@@ -202,6 +202,7 @@ def check(game_id):
         '''
         df = pd.read_excel(os.path.join('.\\uploads', file))
         vali_list, error_list = check_regist(df, game_id)
+
     return render_template('check.html', error_list=error_list)
  
 
