@@ -14,6 +14,7 @@ import pandas as pd
 from datetime import datetime
 from flask import Flask, flash, url_for, render_template, request, redirect
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 from flask_dropzone import Dropzone
 from flask_moment import Moment
 from flask_bootstrap import Bootstrap
@@ -62,6 +63,7 @@ app.config['DROPZONE_MAX_FILES'] = 30
 
 # instantiate a db object of SQLAlchemy class
 db = SQLAlchemy(app)
+migrate = Migrate(app, db)
 bootstrap = Bootstrap(app)
 moment = Moment(app)
 dropzone = Dropzone(app)
@@ -92,6 +94,7 @@ class User (db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(20), unique=True, index=True)
     sex = db.Column(db.Boolean)
+    archery = db.Column(db.String(32))
     id_num = db.Column(db.String(18), unique=True)  # ID card number
     club_id = db.Column(db.Integer, db.ForeignKey('club.id'))
     club = db.relationship('Club')
@@ -105,7 +108,8 @@ class User (db.Model):
 
 class Club(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    club = db.Column(db.String(16), unique=True)
+    club = db.Column(db.String(32), unique=True)
+    club_cut = db.Column(db.String(4), unique=True, index=True)
     logo_path = db.Column(db.String(127), unique=True)
     club_num = db.Column(db.Integer, unique=True, index=True)
     users = db.relationship('User')
@@ -183,26 +187,36 @@ def game_upload(game_id=None):
 # and save the rest records to database.
 @app.route('/game/check')
 def check():
-    # try:
-    #    df = load_regist_files()
-    # except IOError:
-    #     error = "error"
-    # error_list = check_regist(df)
+    dirlist = os.listdir('.\\uploads')
+    for file in dirlist:
+        '''
+        俱乐部       	    姓名 	性别 弓种 	Unnamed: 4
+0 	深圳聚贤庄射箭俱乐部  	陈豪 	男 	反曲50M NaN
+1 	深圳聚贤庄射箭俱乐部 	    魏亮 	男 	反曲弓 	NaN
+2 	唐山鸿鹄射箭运动俱乐部 	候雨辰 	男 	反曲弓 	NaN
+3 	唐山鸿鹄射箭运动俱乐部 	刘崎 	男 	反曲弓 	NaN
+4 	唐山鸿鹄射箭运动俱乐部 	马天宇 	男 	反曲弓 	NaN
+5 	唐山鸿鹄射箭运动俱乐部 	李清语 	女 	反曲弓 	NaN
+6 	唐山鸿鹄射箭运动俱乐部 	胡洋 	男 	复合弓 	NaN
+7 	北京大学射箭代表队 	    林达 	男 	反曲弓 	NaN
+        '''
+        df = pd.read_excel(os.path.join('.\\uploads', file))
+        check = check_regist(df)
     return render_template('check.html')
  
 
 # TODO(Mojerro): return download link
 @app.route('/download/gamecard')
 def download_game_card():
-    # TODO(Mojerro): search from the db and print to pics
+    # search from the db and print to pics
     buildcard = game_card_builder()
     return render_template('game_download.html')
  
 
-def default(value, default):
+def default(value, defaults):
     if value:
         return value
-    return default
+    return defaults
 
 
 def load_regist_files():
@@ -211,11 +225,25 @@ def load_regist_files():
 
 
 def check_regist(df):
+    vali_list = []
     error_list = []
-    return error_list
+    club_list = []
+    clubs = df.iloc[:, 0]
+    name = df.iloc[:, 1]
+    sex = df.iloc[:, 2]
+    archery = df.iloc[:, 3]
+    for club in clubs:
+        query = {}
+        club = Club.query.filter_by(club=club).first()
+        if club:
+            query
+            vali_list.append(club.id)
+        else:
+            error_list.append(club)
+    return vali_list, error_list
 
 
 def game_card_builder(athelte, game, club, archer, date):
-
-    return True
+    link = os.path.join()
+    return link
 

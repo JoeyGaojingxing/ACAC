@@ -12,11 +12,12 @@ flask-sqlalchemy = "*"
 flask-dropzone = "*"
 pandas = "*"
 flask-moment = "*"
-flask-dotenv = "*"
 python-dotenv = "*"
 flask-bootstrap = "*"
 pymysql = "*"
 jinja2 = "*"
+xlrd = "*"
+flask-migrate = "*"
 
 [requires]
 python_version = "3.6"
