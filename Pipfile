@@ -11,6 +11,11 @@ flask-wtf = "*"
 flask-sqlalchemy = "*"
 flask-dropzone = "*"
 pandas = "*"
+flask-moment = "*"
+flask-dotenv = "*"
+python-dotenv = "*"
+flask-bootstrap = "*"
+pymysql = "*"
 
 [requires]
 python_version = "3.6"

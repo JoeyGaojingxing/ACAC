@@ -13,7 +13,6 @@ import click
 import pandas as pd
 from datetime import datetime
 from flask import Flask, flash, url_for, render_template, request, redirect
-from flask import render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_dropzone import Dropzone
 from flask_moment import Moment
@@ -37,7 +36,7 @@ else:
     prefix = 'sqlite:////'
 
 # if use mysql
-mysql_prefix = 'mysql+pymysql://root:0327@localhost/demo'
+mysql_prefix = 'mysql+pymysql://root:'
 
 app = Flask(__name__)
 app.jinja_env.trim_blocks = True
@@ -45,12 +44,13 @@ app.jinja_env.lstrip_blocks = True
 
 # Custom config
 app.config['UPLOAD_PATH'] = os.path.join(app.root_path, 'uploads')
-app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'secret string')
+app.config['SECRET_KEY'] = mysql_prefix + os.getenv('SECRET_KEY', 'secret string')
 app.config['ALLOWED_EXTENSIONS'] = ['xls', 'xlsx']
 
 # SQLAlchemy config
 # app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', prefix + os.path.join(app.root_path, 'demo.sqlite'))
-app.config['SQLALCHEMY_DATABASE_URI'] = mysql_prefix
+app.config['SQLALCHEMY_DATABASE_URI'] = mysql_prefix + os.getenv('MYSQL_PASS', '0327') + '@' \
+                                        + os.getenv('MYSQL_URI', 'localhost') + '/acac_demo'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Flask-Dropzone config
