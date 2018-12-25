@@ -20,7 +20,7 @@ from flask_moment import Moment
 from flask_bootstrap import Bootstrap
 # from flask_wtf.csrf import validate_csrf
 
-from forms import SetTitleForm
+from forms import *
 
 
 # SQLite URI compatible
@@ -164,7 +164,6 @@ def game_name():
 
 # use WTForm to upload excels.
 @app.route('/game/upload/<int:game_id>', methods=['GET', 'POST'])
-# @app.route('/game/upload', methods=['GET', 'POST'])
 def game_upload(game_id):
     # Excel files upload
     if request.method == 'POST':
@@ -183,9 +182,8 @@ def game_upload(game_id):
     return render_template('game_upload.html', game_id=game_id)
 
 
-# TODO(Mojerro): return the records(rows) which have problems
-# and save the rest records to database.
-@app.route('/game/check/<int:game_id>')
+# TODO(Mojerro): return the records(rows) which have problems and save the rest records to database.
+@app.route('/game/check/<int:game_id>', methods=['GET', 'POST'])
 def check(game_id):
     dirlist = os.listdir('.\\uploads')
     for file in dirlist:
@@ -201,9 +199,9 @@ def check(game_id):
 7 	北京大学射箭代表队 	    林达 	男 	反曲弓 	NaN
         '''
         df = pd.read_excel(os.path.join('.\\uploads', file))
-        vali_list, error_list = check_regist(df, game_id)
-
-    return render_template('check.html', error_list=error_list)
+        vali_list, error_list = check_regist(df)
+    form = CheckFileForm()
+    return render_template('check.html', error_list=error_list, form=form)
  
 
 # TODO(Mojerro): return download link
@@ -237,7 +235,7 @@ def check_regist(df):
             vali_list.append(info)
         else:
             error_list.append([club.club_num, club.club])
-    return vali_list, error_list
+    return render_template(error=error_list, vali=vali_list)
 
 
 def game_card_builder(athelte, game, club, archer, date):
