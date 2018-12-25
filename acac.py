@@ -165,7 +165,7 @@ def game_name():
 # use WTForm to upload excels.
 @app.route('/game/upload/<int:game_id>', methods=['GET', 'POST'])
 # @app.route('/game/upload', methods=['GET', 'POST'])
-def game_upload(game_id=None):
+def game_upload(game_id):
     # Excel files upload
     if request.method == 'POST':
         # check if the post request has the file part
@@ -185,8 +185,8 @@ def game_upload(game_id=None):
 
 # TODO(Mojerro): return the records(rows) which have problems
 # and save the rest records to database.
-@app.route('/game/check')
-def check():
+@app.route('/game/check/<int:game_id>')
+def check(game_id):
     dirlist = os.listdir('.\\uploads')
     for file in dirlist:
         '''
@@ -201,8 +201,8 @@ def check():
 7 	北京大学射箭代表队 	    林达 	男 	反曲弓 	NaN
         '''
         df = pd.read_excel(os.path.join('.\\uploads', file))
-        check = check_regist(df)
-    return render_template('check.html')
+        vali_list, error_list = check_regist(df, game_id)
+    return render_template('check.html', error_list=error_list)
  
 
 # TODO(Mojerro): return download link
@@ -227,19 +227,15 @@ def load_regist_files():
 def check_regist(df):
     vali_list = []
     error_list = []
-    club_list = []
     clubs = df.iloc[:, 0]
-    name = df.iloc[:, 1]
-    sex = df.iloc[:, 2]
-    archery = df.iloc[:, 3]
-    for club in clubs:
-        query = {}
+    length = len(clubs)
+    for i in range(length):
         club = Club.query.filter_by(club=club).first()
         if club:
-            query
-            vali_list.append(club.id)
+            info = df.loc[i, ['姓名', '性别', '弓种']].append(pd.Series({'club_id': club.id}))
+            vali_list.append(info)
         else:
-            error_list.append(club)
+            error_list.append([club.club_num, club.club])
     return vali_list, error_list
 
 
