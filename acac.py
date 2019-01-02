@@ -18,8 +18,6 @@ from flask_migrate import Migrate
 from flask_dropzone import Dropzone
 from flask_moment import Moment
 from flask_bootstrap import Bootstrap
-# from flask_wtf.csrf import validate_csrf
-
 from forms import SetTitleForm
 
 
@@ -187,7 +185,7 @@ def game_upload():
         if f and allowed_file(f.filename):
             filename = random_filename(f.filename, game_id=game_id)
             f.save(os.path.join(
-                app.config['UPLOAD_PATH'], filename
+                app.config['UPLOAD_PATH'], game_id, filename
             ))
         else:
             return 'Invalid file type.', 400
@@ -198,10 +196,9 @@ def game_upload():
 # and save the rest records to database.
 @app.route('/game/check/')
 def check():
-    game_id = request.cookies.get('game_id')
-    print(game_id)
-    dirlist = os.listdir('.\\uploads')
-    for file in dirlist:
+    game_id = request.cookies.get('game_id')  # game_id is a string
+    dir_list = os.listdir('.\\{}\\uploads'.format(game_id))
+    for file in dir_list:
         '''
         俱乐部       	    姓名 	性别 弓种 	Unnamed: 4
 0 	深圳聚贤庄射箭俱乐部  	陈豪 	男 	反曲50M NaN
@@ -213,8 +210,9 @@ def check():
 6 	唐山鸿鹄射箭运动俱乐部 	胡洋 	男 	复合弓 	NaN
 7 	北京大学射箭代表队 	    林达 	男 	反曲弓 	NaN
         '''
+        # choose the file
         df = pd.read_excel(os.path.join('.\\uploads', file))
-        vali_list, error_list = check_regist(df, game_id)
+        val_list, error_list = check_regist(df, game_id)
     return render_template('check.html', error_list=error_list)
  
 
@@ -256,3 +254,18 @@ def game_card_builder(athelte, game, club, archer, date):
     link = os.path.join()
     return link
 
+
+def make_dirs(path):
+    # 去除首位空格
+    path = path.strip()
+    # 去除尾部 \ 符号
+    path = path.rstrip("\\")
+
+    # 判断路径是否存在
+    isExists = os.path.exists(path)
+
+    if not isExists:
+        os.makedirs(path)
+        return True
+    else:
+        return False
