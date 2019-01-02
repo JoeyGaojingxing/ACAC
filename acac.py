@@ -1,7 +1,7 @@
 # _*_ coding: utf-8 _*_
 """
     :author: Mojerro (高景行)
-    :url: http://
+    :url: http://mojerro.我爱你
     :copyright: © 2018
     :license: MIT, see LICENSE for more details
 """
@@ -12,7 +12,7 @@ import uuid
 import click
 import pandas as pd
 from datetime import datetime
-from flask import Flask, flash, url_for, render_template, request, redirect
+from flask import Flask, flash, url_for, render_template, request, redirect, make_response
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_dropzone import Dropzone
@@ -162,11 +162,22 @@ def game_name():
     return render_template('game_name.html', form=form, games=games)
 
 
+@app.route('/set/<int:game_id>')
+def set_cookie(game_id):
+    if game_id:
+        response = make_response(redirect(url_for('game_upload')))
+        response.set_cookie('game_id', str(game_id))
+    else:
+        raise NameError
+    return response
+
+
 # use WTForm to upload excels.
-@app.route('/game/upload/<int:game_id>', methods=['GET', 'POST'])
+@app.route('/game/upload/', methods=['GET', 'POST'])
 # @app.route('/game/upload', methods=['GET', 'POST'])
-def game_upload(game_id):
+def game_upload():
     # Excel files upload
+    game_id = request.args.get('game_id')
     if request.method == 'POST':
         # check if the post request has the file part
         if 'file' not in request.files:
@@ -180,13 +191,15 @@ def game_upload(game_id):
             ))
         else:
             return 'Invalid file type.', 400
-    return render_template('game_upload.html', game_id=game_id)
+    return render_template('game_upload.html')
 
 
 # TODO(Mojerro): return the records(rows) which have problems
 # and save the rest records to database.
-@app.route('/game/check/<int:game_id>')
-def check(game_id):
+@app.route('/game/check/')
+def check():
+    game_id = request.cookies.get('game_id')
+    print(game_id)
     dirlist = os.listdir('.\\uploads')
     for file in dirlist:
         '''
@@ -224,7 +237,7 @@ def load_regist_files():
     return df
 
 
-def check_regist(df):
+def check_regist(df, game_id):
     vali_list = []
     error_list = []
     clubs = df.iloc[:, 0]

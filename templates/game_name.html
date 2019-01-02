@@ -6,7 +6,7 @@
         {{ render_form(form, action=request.full_path) }}
     </div>
     {% for message in games %}
-        <a class="list-group-item list-group-item-action flex-column" href="{{ url_for('game_upload', game_id=message.id) }}">
+        <a class="list-group-item list-group-item-action flex-column" href="{{ url_for('set_cookie', game_id=message.id) }}">
             <div class="d-flex w-100 justify-content-between">
                 <h5 class="mb-1 text-success">{{ message.name }}
                     <small class="text-muted"> #{{ loop.revindex }}</small>

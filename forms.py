@@ -6,10 +6,8 @@
     :license: MIT, see LICENSE for more details
 """
 from flask_wtf import FlaskForm
-from flask_wtf.file import FileField, FileRequired, FileAllowed
-from wtforms import StringField, PasswordField, BooleanField, IntegerField, \
-    TextAreaField, SubmitField, MultipleFileField
-from wtforms.validators import DataRequired, Length, ValidationError, Email
+from wtforms import StringField, SubmitField
+from wtforms.validators import DataRequired, Length
 
 
 # set game title
