@@ -13,11 +13,11 @@ flask-dropzone = "*"
 pandas = "*"
 flask-moment = "*"
 python-dotenv = "*"
-flask-bootstrap = "*"
 pymysql = "*"
 jinja2 = "*"
 xlrd = "*"
 flask-migrate = "*"
+bootstrap-flask = "*"
 
 [requires]
 python_version = "3.6"
