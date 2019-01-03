@@ -1,8 +1,9 @@
 {% extends 'base.html' %}
+{% from 'bootstrap/form.html' import render_form, render_field %}
 
 {% block content %}
-<h1>Forms</h1>
-<ul>
-    <li><a href="{{ url_for('game_name') }}">Download</a></li>
-</ul>
+<h1>下载页</h1>
+    <div class="game-name">
+        {{ render_form(form, action=request.full_path) }}
+    </div>
 {% endblock %}

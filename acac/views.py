@@ -5,16 +5,11 @@
     :copyright: © 2018
     :license: MIT, see LICENSE for more details
 """
-import os
-import uuid
-
-import pandas as pd
+from acac.utils import *
+from acac.forms import SetTitleForm, SubmitForm
 from datetime import datetime
 from flask import flash, url_for, render_template, request, redirect, make_response
-from acac.forms import SetTitleForm
-from acac.models import Game, Club, User
-
-from acac import app, db
+from threading import Thread
 
 
 # index page, set game name
@@ -49,7 +44,6 @@ def set_cookie(game_id):
 
 # use WTForm to upload excels.
 @app.route('/game/upload/', methods=['GET', 'POST'])
-# @app.route('/game/upload', methods=['GET', 'POST'])
 def game_upload():
     # Excel files upload
     game_id = request.cookies.get('game_id')
@@ -86,6 +80,7 @@ def check():
     '''
     # choose the file
     val_list, error_list = check_regist(game_id)
+    flash('导入成功')
     return render_template('check.html', error_list=error_list)
 
 
@@ -93,67 +88,10 @@ def check():
 @app.route('/download/gamecard')
 def download_game_card():
     # search from the db and print to pics
-    buildcard = game_card_builder()
-    return render_template('game_download.html')
-
-
-def default(value, defaults):
-    if value:
-        return value
-    return defaults
-
-
-def load_regist_files():
-    df = pd.DataFrame([1, 2])
-    return df
-
-
-# TODO(Mojerro): insert contents into DataBase
-def check_regist(game_id):
-    vali_list = []
-    error_list = []
-    path = os.path.join(app.config['UPLOAD_PATH'], game_id)
-    for file in os.listdir(path):
-        df = pd.read_excel(os.path.join(path, file))
-        clubs = df.iloc[:, 0]
-        length = len(clubs)
-        for i in range(length):
-            club = Club.query.filter_by(club=clubs[i]).first()
-            if club:
-                info = df.loc[i, ['姓名', '性别', '弓种']].append(pd.Series({'club_id': club.id}))
-                vali_list.append(info)
-            else:
-                error_list.append(df.iloc[i])
-    return vali_list, error_list
-
-
-def game_card_builder(athelte, game, club, archer, date):
-    link = os.path.join()
-    return link
-
-
-def make_dirs(path):
-    # 去除首位空格
-    path = path.strip()
-    # 去除尾部 \ 符号
-    path = path.rstrip("\\")
-
-    # 判断路径是否存在
-    exists = os.path.exists(path)
-
-    if not exists:
-        os.makedirs(path)
-        return True
-    else:
-        return False
-
-
-def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
-
-
-def random_filename(filename, game_id: str):
-    ext = os.path.splitext(filename)[1]
-    new_filename = uuid.uuid4().hex + ext
-    return game_id + '_' + new_filename
+    form = SubmitForm()
+    if form.execute.data:
+        pass
+        buildcard = game_card_builder()
+    elif form.download:
+        pass
+    return render_template('game_download.html', form=form)
