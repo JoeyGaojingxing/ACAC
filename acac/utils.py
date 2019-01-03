@@ -26,7 +26,7 @@ def load_regist_files():
     return df
 
 
-# TODO(Mojerro): insert contents into DataBase
+# insert contents into DataBase
 def check_regist(game_id):
     vali_list = []
     error_list = []

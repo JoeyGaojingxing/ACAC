@@ -42,4 +42,4 @@ app.config['DROPZONE_ALLOWED_FILE_CUSTOM'] = True
 app.config['DROPZONE_ALLOWED_FILE_TYPE'] = '.xls, .xlsx'
 app.config['DROPZONE_MAX_FILE_SIZE'] = 3
 app.config['DROPZONE_MAX_FILES'] = 30
-# app.config['DROPZONE_ENABLE_CSRF'] = True
+app.config['DROPZONE_ENABLE_CSRF'] = True

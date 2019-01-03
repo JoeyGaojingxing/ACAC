@@ -10,13 +10,15 @@ from flask_bootstrap import Bootstrap
 from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
 from flask_dropzone import Dropzone
+from werkzeug.contrib.fixers import ProxyFix
 
 app = Flask('acac')
 app.config.from_pyfile('settings.py')
-# # the first newline after a block is removed
-# app.jinja_env.trim_blocks = True
-# # spaces and tabs are stripped from the start of a line to a block
-# app.jinja_env.lstrip_blocks = True
+# the first newline after a block is removed
+app.jinja_env.trim_blocks = True
+# spaces and tabs are stripped from the start of a line to a block
+app.jinja_env.lstrip_blocks = True
+app.wsgi_app = ProxyFix(app.wsgi_app)
 
 db = SQLAlchemy(app)
 bootstrap = Bootstrap(app)
