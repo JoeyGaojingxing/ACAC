@@ -1,8 +1,12 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>Forms</h1>
-<ul>
-    <li><a href="{{ url_for('game_name') }}">Check Html</a></li>
-</ul>
+<h1>以下信息有误，请核对</h1>
+
+<ol>
+{% for foo in error_list %}
+    <li>{{ foo }}</li>
+{% endfor %}
+</ol>
+
 {% endblock %}
