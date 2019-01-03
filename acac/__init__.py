@@ -1,7 +1,15 @@
+# _*_ coding: utf-8 _*_
+"""
+    :author: Mojerro (高景行)
+    :url: http://mojerro.我爱你
+    :copyright: © 2018
+    :license: MIT, see LICENSE for more details
+"""
 from flask import Flask
 from flask_bootstrap import Bootstrap
 from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
+from flask_dropzone import Dropzone
 
 app = Flask('acac')
 app.config.from_pyfile('settings.py')
@@ -13,5 +21,6 @@ app.config.from_pyfile('settings.py')
 db = SQLAlchemy(app)
 bootstrap = Bootstrap(app)
 moment = Moment(app)
+dropzone = Dropzone(app)
 
 from acac import views, errors, commands

@@ -6,13 +6,16 @@
     :license: MIT, see LICENSE for more details
 """
 import os
+import uuid
 
 import pandas as pd
 from datetime import datetime
 from flask import flash, url_for, render_template, request, redirect, make_response
-from forms import SetTitleForm
+from acac.forms import SetTitleForm
+from acac.models import Game, Club, User
 
 from acac import app, db
+
 
 # index page, set game name
 @app.route('/', methods=['GET', 'POST'])
@@ -136,10 +139,21 @@ def make_dirs(path):
     path = path.rstrip("\\")
 
     # 判断路径是否存在
-    isExists = os.path.exists(path)
+    exists = os.path.exists(path)
 
-    if not isExists:
+    if not exists:
         os.makedirs(path)
         return True
     else:
         return False
+
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
+
+
+def random_filename(filename, game_id: str):
+    ext = os.path.splitext(filename)[1]
+    new_filename = uuid.uuid4().hex + ext
+    return game_id + '_' + new_filename
