@@ -81,7 +81,7 @@ def check():
     # choose the file
     val_list, error_list = check_regist(game_id)
     flash('导入成功')
-    return render_template('check.html', error_list=error_list)
+    return render_template('check.html', error_list=error_list)  # TODO（Mojerro）：错误输出到网页，格式优化
 
 
 # TODO(Mojerro): return download link
