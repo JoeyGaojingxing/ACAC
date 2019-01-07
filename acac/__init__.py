@@ -10,6 +10,7 @@ from flask_bootstrap import Bootstrap
 from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
 from flask_dropzone import Dropzone
+from flask_migrate import Migrate
 from werkzeug.contrib.fixers import ProxyFix
 
 app = Flask('acac')
@@ -24,5 +25,6 @@ db = SQLAlchemy(app)
 bootstrap = Bootstrap(app)
 moment = Moment(app)
 dropzone = Dropzone(app)
+migrate = Migrate(app, db)
 
 from acac import views, errors, commands

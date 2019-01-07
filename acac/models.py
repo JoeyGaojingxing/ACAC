@@ -22,6 +22,7 @@ class User (db.Model):
     sex = db.Column(db.Boolean)
     archery = db.Column(db.String(32))
     id_num = db.Column(db.String(18), unique=True)  # ID card number
+    remark = db.Column(db.Text(1024))
     club_id = db.Column(db.Integer, db.ForeignKey('club.id'))
     club = db.relationship('Club')
     games = db.relationship('Game',
@@ -35,6 +36,7 @@ class Club(db.Model):
     club_cut = db.Column(db.String(4), unique=True, index=True)
     logo_path = db.Column(db.String(127), unique=True)
     club_num = db.Column(db.Integer, unique=True, index=True)
+    remark = db.Column(db.Text(1024))
     users = db.relationship('User')
 
 
@@ -44,6 +46,7 @@ class Game(db.Model):
     date = db.Column(db.Date, index=True)
     location = db.Column(db.String(127))
     timestamp = db.Column(db.DateTime, default=datetime.now, index=True)
+    remark = db.Column(db.Text(1024))
     users = db.relationship('User',
                             secondary=association_table,
                             back_populates='games')

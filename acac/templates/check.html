@@ -3,5 +3,7 @@
 {% block content %}
 <h1>以下信息有误，请核对</h1>
 
+
+    {{ error_list }}
 <a href="{{ url_for('download_game_card') }}">下一页，下载</a>
 {% endblock %}

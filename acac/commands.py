@@ -12,7 +12,7 @@ from acac import app, db
 
 @app.cli.command()
 @click.option('--drop', is_flag=True, help='Create after drop.')
-def init_db(drop):
+def initdb(drop):
     """Initialize the database"""
     if drop:
         db.drop_all()
