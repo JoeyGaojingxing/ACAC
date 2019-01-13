@@ -1,9 +1,34 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>以下信息有误，请核对</h1>
 
 
-    {{ error_list }}
-<a href="{{ url_for('download_game_card') }}">下一页，下载</a>
+{% if error_list %}
+    <h1>以下信息有误，请核对</h1>
+    <table class="table table-responsive-md table-striped">
+        <thead>
+        <tr>
+            <th>俱乐部</th>
+            <th>姓名</th>
+            <th>性别</th>
+            <th>弓种</th>
+            <th>备注</th>
+        </tr>
+        </thead>
+    {% for i in error_list %}
+        <tr>
+            <th>{{ i['俱乐部'] }}</th>
+            <th>{{ i['姓名'] }}</th>
+            <th>{{ i['性别'] }}</th>
+            <th>{{ i['弓种'] }}</th>
+            <th>{{ i['备注'] }}</th>
+        </tr>
+    {% endfor %}
+    </table>
+
+{% else %}
+        <h1>没有错误，输入成功！</h1>
+{% endif %}
+<a class="btn btn-outline-primary btn-lg" role="button" href="{{ url_for('game_upload') }}">更正错误信息</a>
+<a class="btn btn-outline-primary btn-lg" role="button" href="{{ url_for('download_game_card') }}">下一页，下载</a>
 {% endblock %}

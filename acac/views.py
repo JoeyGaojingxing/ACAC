@@ -8,8 +8,8 @@
 from acac.utils import *
 from acac.forms import SetTitleForm, SubmitForm
 from datetime import datetime
-from flask import flash, url_for, render_template, request, redirect, make_response
-from threading import Thread
+from flask import flash, url_for, render_template, request, redirect, make_response, send_from_directory, send_file
+# from threading import Thread
 
 
 # index page, set game name
@@ -81,17 +81,17 @@ def check():
     # choose the file
     val_list, error_list = check_regist(game_id)
     flash('导入成功')
-    return render_template('check.html', error_list=error_list)  # TODO（Mojerro）：错误输出到网页，格式优化
+    return render_template('check.html', error_list=error_list)  # 错误输出到网页，格式优化
 
 
-# TODO(Mojerro): return download link
-@app.route('/download/gamecard')
+# TODO(Mojerro): return download link, 实现页面等待效果
+@app.route('/download/gamecard', methods=['GET', 'POST'])
 def download_game_card():
+    game_id = request.cookies.get('game_id')  # game_id is a string
     # search from the db and print to pics
     form = SubmitForm()
-    if form.execute.data:
-        pass
-        buildcard = game_card_builder()
-    elif form.download:
-        pass
+    if form.download.data:
+        builder = GameCardBuilder(game_id, './acac/static/images/gamecard/2019.png')
+        card_dir = builder.render()
+        return send_file(card_dir, as_attachment=True, attachment_filename='demo.zip')
     return render_template('game_download.html', form=form)

@@ -28,6 +28,7 @@ mysql_prefix = 'mysql+pymysql://root:'
 
 # Custom config
 app.config['UPLOAD_PATH'] = os.path.join(app.root_path, 'uploads')
+app.config['DOWNLOAD_PATH'] = 'downloads'
 app.config['SECRET_KEY'] = mysql_prefix + os.getenv('SECRET_KEY', 'secret string')
 app.config['ALLOWED_EXTENSIONS'] = ['xls', 'xlsx']
 
@@ -43,3 +44,4 @@ app.config['DROPZONE_ALLOWED_FILE_TYPE'] = '.xls, .xlsx'
 app.config['DROPZONE_MAX_FILE_SIZE'] = 3
 app.config['DROPZONE_MAX_FILES'] = 30
 # app.config['DROPZONE_ENABLE_CSRF'] = True
+app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False

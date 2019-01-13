@@ -4,6 +4,7 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
+flask-debugtoolbar = "*"
 
 [packages]
 flask = "*"
@@ -20,6 +21,9 @@ flask-migrate = "*"
 bootstrap-flask = "*"
 werkzeug = "*"
 numpy = "*"
+opencv-python = "*"
+pillow = "*"
+zipfile = "*"
 
 [requires]
-python_version = "3.6"
+python_version = "3.7"

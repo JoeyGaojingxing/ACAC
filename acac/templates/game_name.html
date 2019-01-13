@@ -5,12 +5,14 @@
     <div class="game-name">
         {{ render_form(form, action=request.full_path) }}
     </div>
-    {% for message in games %}
+        {% for message in games %}
         <a class="list-group-item list-group-item-action flex-column" href="{{ url_for('set_cookie', game_id=message.id) }}">
             <div class="d-flex w-100 justify-content-between">
                 <h5 class="mb-1 text-success">{{ message.name }}
                     <small class="text-muted"> #{{ loop.revindex }}</small>
                 </h5>
+
+
                 <small data-toggle="tooltip" data-placement="top"
                        data-timestamp="{{ message.timestamp.strftime('%Y-%m-%dT%H:%M:%SZ') }}"
                        data-delay="500">
